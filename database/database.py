@@ -5,7 +5,10 @@ import dotenv
 
 environ = dotenv.dotenv_values()
 
-SQLALCHEMY_DATABASE_URL = environ.get("DATABASE_URL")
+database_url = f"postgresql://{environ.get("POSTGRES_USER")}:{environ.get("POSTGRES_PASSWORD")}@{
+    environ.get("POSTGRES_SERVER")}:{environ.get("POSTGRES_PORT")}/{environ.get("POSTGRES_DB")}"
+
+SQLALCHEMY_DATABASE_URL = database_url
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
