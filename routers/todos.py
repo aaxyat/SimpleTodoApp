@@ -15,12 +15,7 @@ router = APIRouter(
 
 
 def get_db():
-    """
-    Returns a database session.
 
-    Returns:
-        SessionLocal: The database session.
-    """
     db = SessionLocal()
     try:
         yield db
@@ -33,15 +28,7 @@ user_depends = Annotated[dict, Depends(get_current_user)]
 
 
 class TodoRequest(BaseModel):
-    """
-    Represents a request for creating a new todo item.
 
-    Attributes:
-        title (str): The title of the todo item. Must have a minimum length of 3 characters.
-        description (str): The description of the todo item. Must have a minimum length of 1 character and a maximum length of 100 characters.
-        priority (int): The priority of the todo item. Must be a value between 1 and 5 (inclusive).
-        completed (bool): Indicates whether the todo item is completed or not.
-    """
     title: str = Field(min_length=3)
     description: str = Field(min_length=1, max_length=100)
     priority: int = Field(ge=1, le=5)
@@ -52,19 +39,6 @@ class TodoRequest(BaseModel):
 
 @router.get("/", status_code=status.HTTP_200_OK)
 async def read_all_todos(user: user_depends, db: db_depends):
-    """
-    Retrieve all todos for a specific user.
-
-    Args:
-        user (user_depends): The user object obtained from the authentication process.
-        db (db_depends): The database object used to query the todos.
-
-    Returns:
-        List[models.Todos]: A list of todos belonging to the user.
-
-    Raises:
-        HTTPException: If the user is not authenticated or no todos are found.
-    """
 
     if not user:
         raise HTTPException(status_code=401, detail="Authentication Failed")
@@ -78,21 +52,7 @@ async def read_all_todos(user: user_depends, db: db_depends):
 
 @router.get("/{todo_id}", status_code=status.HTTP_200_OK)
 async def get_todo_by_id(user: user_depends, db: db_depends, todo_id: int = Path(ge=1)):
-    """
-    Retrieve a todo item by its ID.
 
-    Parameters:
-    - user: The user object representing the authenticated user.
-    - db: The database dependency.
-    - todo_id: The ID of the todo item to retrieve.
-
-    Returns:
-    - The todo item with the specified ID.
-
-    Raises:
-    - HTTPException(401): If authentication fails.
-    - HTTPException(404): If the todo item is not found.
-    """
     if not user:
         raise HTTPException(status_code=401, detail="Authentication Failed")
 
@@ -108,20 +68,7 @@ async def get_todo_by_id(user: user_depends, db: db_depends, todo_id: int = Path
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_new_todo(user: user_depends, db: db_depends, todo: TodoRequest):
-    """
-    Create a new todo item.
 
-    Args:
-        user (user_depends): The user object representing the authenticated user.
-        db (db_depends): The database session.
-        todo (TodoRequest): The request body containing the todo details.
-
-    Raises:
-        HTTPException: If authentication fails.
-
-    Returns:
-        None
-    """
     if not user:
         raise HTTPException(status_code=401, detail="Authentication Failed")
 
@@ -137,21 +84,7 @@ async def update_todo_by_id(user: user_depends,
                             db: db_depends,
                             todo_request: TodoRequest,
                             todo_id: int = Path(ge=1)):
-    """
-    Update a todo item by its ID.
 
-    Args:
-        user (user_depends): The user making the request.
-        db (db_depends): The database session.
-        todo_request (TodoRequest): The updated todo item data.
-        todo_id (int, optional): The ID of the todo item to update. Defaults to Path(ge=1).
-
-    Raises:
-        HTTPException: If authentication fails or the todo item is not found.
-
-    Returns:
-        None
-    """
     if not user:
         raise HTTPException(status_code=401, detail="Authentication Failed")
 
@@ -172,20 +105,7 @@ async def update_todo_by_id(user: user_depends,
 # Delete Routes
 @router.delete("/delete/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo_by_id(user: user_depends, db: db_depends, todo_id: int = Path(ge=1)):
-    """
-    Delete a todo by its ID.
 
-    Args:
-        user (user_depends): The user making the request.
-        db (db_depends): The database session.
-        todo_id (int, optional): The ID of the todo to be deleted. Defaults to Path(ge=1).
-
-    Raises:
-        HTTPException: If authentication fails or the todo is not found.
-
-    Returns:
-        None
-    """
     if not user:
         raise HTTPException(status_code=401, detail="Authentication Failed")
 
