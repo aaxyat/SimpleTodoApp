@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import FastAPI
 
-from .models import models
+from models import models
 from database.database import engine
 from routers import auth, todos
 
