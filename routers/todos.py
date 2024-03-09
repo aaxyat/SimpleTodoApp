@@ -7,7 +7,10 @@ from database.database import SessionLocal
 from starlette import status
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/api/todos",
+    tags=["todos"]
+)
 
 
 def get_db():
@@ -45,7 +48,7 @@ class TodoRequest(BaseModel):
 # Get Routes
 
 
-@router.get("/api/todos", status_code=status.HTTP_200_OK)
+@router.get("/", status_code=status.HTTP_200_OK)
 async def read_all_todos(db: db_depends):
     """
     Retrieve all todos from the database.
@@ -64,7 +67,7 @@ async def read_all_todos(db: db_depends):
     return db.query(models.Todos).all()
 
 
-@router.get("/api/todo/{todo_id}", status_code=status.HTTP_200_OK)
+@router.get("/{todo_id}", status_code=status.HTTP_200_OK)
 async def get_todo_by_id(db: db_depends, todo_id: int = Path(ge=1)):
     """
     Retrieve a todo item by its ID.
@@ -88,7 +91,7 @@ async def get_todo_by_id(db: db_depends, todo_id: int = Path(ge=1)):
 # Post Routes
 
 
-@router.post("/api/todo/create", status_code=status.HTTP_201_CREATED)
+@router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_new_todo(db: db_depends, todo: TodoRequest):
     """
     Create a new todo item.
@@ -110,7 +113,7 @@ async def create_new_todo(db: db_depends, todo: TodoRequest):
 
 # Put Routes
 
-@router.put("/api/todo/update/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("update/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo_by_id(db: db_depends,
                             todo_request: TodoRequest,
                             todo_id: int = Path(ge=1)):
@@ -142,7 +145,7 @@ async def update_todo_by_id(db: db_depends,
 
 
 # Delete Routes
-@router.delete("/api/todo/delete/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/delete/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo_by_id(db: db_depends, todo_id: int = Path(ge=1)):
     """
     Delete a todo by its ID.

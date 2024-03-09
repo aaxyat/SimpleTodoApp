@@ -5,7 +5,6 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from database.database import SessionLocal
 from models import models
-from models.models import Users
 from passlib.context import CryptContext
 from starlette import status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
@@ -14,13 +13,16 @@ import dotenv
 
 environ = dotenv.dotenv_values()
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/api/auth",
+    tags=["auth"]
+)
 
 SECRET_KEY = environ.get("SECRET_KEY")
 ALGORITHM = environ.get("ALGORITHM")
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl="/api/token")
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 
 
 class CreateUserRequest(BaseModel):
@@ -141,7 +143,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
                             detail="Invalid authentication credentials")
 
 
-@router.post("/api/auth", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_depends,
                       create_user_request: CreateUserRequest):
     """
@@ -168,7 +170,7 @@ async def create_user(db: db_depends,
     db.commit()
 
 
-@router.post("/api/token", status_code=status.HTTP_200_OK, response_model=Token)
+@router.post("/token", status_code=status.HTTP_200_OK, response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_depends):
     """
     Authenticates a user and generates an access token.
@@ -186,7 +188,7 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     user = is_user_authenticated(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Incorrect username or password")
+                            detail="Couldn't Validate User.")
     token = create_access_token(
         user.username, user.id, timedelta(minutes=60))
 
