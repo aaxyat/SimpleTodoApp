@@ -21,7 +21,7 @@ This project is a simple Todo API built with FastAPI and SQLAlchemy. It provides
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/todo-api.git
+git clone https://github.com/aaxyat/todo-api.git
 cd todo-api
 ```
 
